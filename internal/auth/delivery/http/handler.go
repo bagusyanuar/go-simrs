@@ -23,22 +23,7 @@ func (h *AuthHandler) Register(router fiber.Router) {
 	auth.Post("/refresh", h.Refresh)
 }
 
-type LoginRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-}
 
-type RefreshRequest struct {
-	// RefreshToken is now passed via Cookie
-}
-
-type LoginResponse struct {
-	AccessToken string `json:"access_token"`
-}
-
-type RefreshResponse struct {
-	AccessToken string `json:"access_token"`
-}
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req LoginRequest
