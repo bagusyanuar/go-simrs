@@ -3,6 +3,7 @@ package container
 import (
 	authHandler "github.com/bagusyanuar/go-simrs/internal/auth/delivery/http"
 	installationHandler "github.com/bagusyanuar/go-simrs/internal/installation/delivery/http"
+	unitHandler "github.com/bagusyanuar/go-simrs/internal/unit/delivery/http"
 	"github.com/bagusyanuar/go-simrs/internal/shared/config"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -11,6 +12,7 @@ import (
 type Container struct {
 	AuthHandler         *authHandler.AuthHandler
 	InstallationHandler *installationHandler.InstallationHandler
+	UnitHandler         *unitHandler.UnitHandler
 }
 
 func NewContainer(db *gorm.DB, conf *config.Config) *Container {
@@ -18,6 +20,7 @@ func NewContainer(db *gorm.DB, conf *config.Config) *Container {
 
 	c.wireAuthModule(db, conf)
 	c.wireInstallationModule(db)
+	c.wireUnitModule(db)
 
 	return c
 }
@@ -28,4 +31,5 @@ func (c *Container) RegisterRoutes(router fiber.Router, authMiddleware fiber.Han
 	// Protected Routes
 	protected := router.Group("/", authMiddleware)
 	c.InstallationHandler.Register(protected)
+	c.UnitHandler.Register(protected)
 }

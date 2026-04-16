@@ -1,0 +1,24 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/units
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "installation_id": "be272eb4-f698-4737-979a-a20b72ca538a",
+    "code": "P-ANAK",
+    "name": "Poli Anak",
+    "is_active": true
+  }
+}

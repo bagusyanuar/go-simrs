@@ -1,0 +1,28 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/units/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 63d3c0f6-28ce-46a2-91fb-cb8ecac12f9e
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "installation_id": "be272eb4-f698-4737-979a-a20b72ca538a",
+    "code": "POL-ANAK",
+    "name": "Poliklinik Anak",
+    "is_active": true
+  }
+}

@@ -1,0 +1,16 @@
+Table units {
+  id uuid [pk, note: "Primary Key menggunakan UUID v4"]
+  installation_id uuid [not null, ref: > installations.id, note: "Relasi ke master instalasi"]
+  code varchar [unique, not null, note: "Kode unik unit/poli (e.g., P-ANAK, P-DALAM)"]
+  name varchar [not null, note: "Nama unit/poliklinik"]
+  
+  // Status
+  is_active boolean [default: true]
+
+  // Audit Fields
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [note: "Soft delete support"]
+
+  Note: "Master data unit (Poliklinik/Ruangan) di bawah Instalasi"
+}
