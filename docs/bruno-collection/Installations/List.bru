@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/installations?page=1&limit=10&sort_by=name&sort_order=asc
+  url: {{baseUrl}}/installations?page=1&limit=10&sort_by=name&sort_order=asc&search
   body: none
   auth: bearer
 }
@@ -15,6 +15,7 @@ query {
   limit: 10
   sort_by: name
   sort_order: asc
+  search: 
 }
 
 auth:bearer {

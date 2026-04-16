@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/bagusyanuar/go-simrs/internal/installation/domain"
-	"github.com/bagusyanuar/go-simrs/pkg/request"
 	"github.com/bagusyanuar/go-simrs/pkg/response"
 	"github.com/bagusyanuar/go-simrs/pkg/validator"
 	"github.com/gofiber/fiber/v2"
@@ -53,21 +52,21 @@ func (h *InstallationHandler) Create(c *fiber.Ctx) error {
 }
 
 func (h *InstallationHandler) GetAll(c *fiber.Ctx) error {
-	var params request.PaginationParam
-	if err := c.QueryParser(&params); err != nil {
+	var filter domain.InstallationFilter
+	if err := c.QueryParser(&filter); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid query parameters"))
 	}
 
-	installations, total, err := h.uc.GetAll(c.Context(), params)
+	installations, total, err := h.uc.GetAll(c.Context(), filter)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
 	}
 
-	limit := params.GetLimit()
+	limit := filter.GetLimit()
 	totalPage := int(math.Ceil(float64(total) / float64(limit)))
 
 	paginationResponse := response.Pagination{
-		CurrentPage: params.GetPage(),
+		CurrentPage: filter.GetPage(),
 		Limit:       limit,
 		TotalData:   total,
 		TotalPage:   totalPage,

@@ -30,9 +30,10 @@ func Start(conf *config.Config, deps *container.Container) {
 
 	// Global Middlewares
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-Request-ID",
-		AllowMethods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+		AllowOrigins:     conf.AllowedOrigins,
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Request-ID",
+		AllowMethods:     "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+		AllowCredentials: true,
 	}))
 	app.Use(requestid.New())         // 1. Generate Request ID
 	app.Use(middleware.Logger(conf)) // 2. Log using custom Zap middleware

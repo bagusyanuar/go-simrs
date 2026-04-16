@@ -10,8 +10,10 @@ type Config struct {
 	AppName    string `mapstructure:"APP_NAME"`
 	AppVersion string `mapstructure:"APP_VERSION"`
 	AppEnv     string `mapstructure:"APP_ENV"`
-	AppPort    string `mapstructure:"APP_PORT"`
-	AppDebug   bool   `mapstructure:"APP_DEBUG"`
+	AppPort        string `mapstructure:"APP_PORT"`
+	AppDebug       bool   `mapstructure:"APP_DEBUG"`
+	AppDomain      string `mapstructure:"APP_DOMAIN"`
+	AllowedOrigins string `mapstructure:"ALLOWED_ORIGINS"`
 
 	DBHost     string `mapstructure:"DB_HOST"`
 	DBPort     string `mapstructure:"DB_PORT"`

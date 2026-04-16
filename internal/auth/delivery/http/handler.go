@@ -3,6 +3,7 @@ package http
 import (
 	"time"
 
+	"github.com/bagusyanuar/go-simrs/internal/shared/config"
 	"github.com/bagusyanuar/go-simrs/internal/user/domain"
 	"github.com/bagusyanuar/go-simrs/pkg/response"
 	"github.com/bagusyanuar/go-simrs/pkg/validator"
@@ -11,10 +12,11 @@ import (
 
 type AuthHandler struct {
 	authUC domain.AuthUsecase
+	conf   *config.Config
 }
 
-func NewAuthHandler(uc domain.AuthUsecase) *AuthHandler {
-	return &AuthHandler{authUC: uc}
+func NewAuthHandler(uc domain.AuthUsecase, conf *config.Config) *AuthHandler {
+	return &AuthHandler{authUC: uc, conf: conf}
 }
 
 func (h *AuthHandler) Register(router fiber.Router) {
@@ -22,8 +24,6 @@ func (h *AuthHandler) Register(router fiber.Router) {
 	auth.Post("/login", h.Login)
 	auth.Post("/refresh", h.Refresh)
 }
-
-
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req LoginRequest
@@ -50,6 +50,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Secure:   false, // Set to true in production
 		SameSite: "Lax",
 		Path:     "/",
+		Domain:   h.conf.AppDomain,
 	})
 
 	res := LoginResponse{

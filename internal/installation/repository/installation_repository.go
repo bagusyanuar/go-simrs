@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/bagusyanuar/go-simrs/internal/installation/domain"
-	"github.com/bagusyanuar/go-simrs/pkg/request"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -25,19 +24,24 @@ func (r *installationRepo) Create(ctx context.Context, installation *domain.Inst
 	return nil
 }
 
-func (r *installationRepo) FindAll(ctx context.Context, params request.PaginationParam) ([]domain.Installation, int64, error) {
+func (r *installationRepo) FindAll(ctx context.Context, filter domain.InstallationFilter) ([]domain.Installation, int64, error) {
 	var installations []domain.Installation
 	var total int64
 
 	db := r.db.WithContext(ctx).Model(&domain.Installation{})
 
+	if filter.Search != "" {
+		searchTerm := "%" + filter.Search + "%"
+		db = db.Where("name ILIKE ? OR code ILIKE ?", searchTerm, searchTerm)
+	}
+
 	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, fmt.Errorf("installationRepo.FindAll.Count: %w", err)
 	}
 
-	if err := db.Order(params.GetSort()).
-		Limit(params.GetLimit()).
-		Offset(params.GetOffset()).
+	if err := db.Order(filter.GetSort()).
+		Limit(filter.GetLimit()).
+		Offset(filter.GetOffset()).
 		Find(&installations).Error; err != nil {
 		return nil, 0, fmt.Errorf("installationRepo.FindAll.Find: %w", err)
 	}

@@ -16,5 +16,5 @@ func (c *Container) wireAuthModule(db *gorm.DB, conf *config.Config) {
 	authUC := authUsecase.NewAuthUsecase(userRepo, conf)
 
 	// 3. Handler
-	c.AuthHandler = authHandler.NewAuthHandler(authUC)
+	c.AuthHandler = authHandler.NewAuthHandler(authUC, conf)
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/bagusyanuar/go-simrs/internal/installation/domain"
-	"github.com/bagusyanuar/go-simrs/pkg/request"
 	"github.com/google/uuid"
 )
 
@@ -27,8 +26,8 @@ func (u *installationUC) Create(ctx context.Context, installation *domain.Instal
 	return u.repo.Create(ctx, installation)
 }
 
-func (u *installationUC) GetAll(ctx context.Context, params request.PaginationParam) ([]domain.Installation, int64, error) {
-	return u.repo.FindAll(ctx, params)
+func (u *installationUC) GetAll(ctx context.Context, filter domain.InstallationFilter) ([]domain.Installation, int64, error) {
+	return u.repo.FindAll(ctx, filter)
 }
 
 func (u *installationUC) GetByID(ctx context.Context, id uuid.UUID) (*domain.Installation, error) {

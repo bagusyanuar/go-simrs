@@ -27,9 +27,14 @@ func (i *Installation) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+type InstallationFilter struct {
+	request.PaginationParam
+	Search string `query:"search"`
+}
+
 type InstallationRepository interface {
 	Create(ctx context.Context, installation *Installation) error
-	FindAll(ctx context.Context, params request.PaginationParam) ([]Installation, int64, error)
+	FindAll(ctx context.Context, filter InstallationFilter) ([]Installation, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Installation, error)
 	FindByCode(ctx context.Context, code string) (*Installation, error)
 	Update(ctx context.Context, installation *Installation) error
@@ -38,7 +43,7 @@ type InstallationRepository interface {
 
 type InstallationUsecase interface {
 	Create(ctx context.Context, installation *Installation) error
-	GetAll(ctx context.Context, params request.PaginationParam) ([]Installation, int64, error)
+	GetAll(ctx context.Context, filter InstallationFilter) ([]Installation, int64, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*Installation, error)
 	Update(ctx context.Context, id uuid.UUID, installation *Installation) error
 	Delete(ctx context.Context, id uuid.UUID) error
