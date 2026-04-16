@@ -1,0 +1,47 @@
+Table specialties {
+  id uuid [pk, note: "Primary Key menggunakan UUID v4"]
+  code varchar [unique, not null, note: "Kode spesialis (e.g. SP-A, SP-PD)"]
+  name varchar [not null, note: "Nama spesialis (e.g. Spesialis Anak, Spesialis Penyakit Dalam)"]
+  
+  // Audit Fields
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [note: "Soft delete support"]
+
+  Note: "Master data spesialisasi dokter"
+}
+
+Table doctors {
+  id uuid [pk, note: "Primary Key menggunakan UUID v4"]
+  specialty_id uuid [ref: > specialties.id, note: "Relasi ke master spesialis"]
+  nik varchar [unique, not null, note: "Nomor Induk Kependudukan / Identitas"]
+  sip varchar [unique, not null, note: "Surat Izin Praktik Dokter"]
+  sip_expiry_date date [not null, note: "Masa berlaku SIP"]
+  name varchar [not null, note: "Nama lengkap beserta gelar"]
+  
+  // Contacts
+  phone varchar
+  email varchar
+
+  // Status
+  is_active boolean [default: true]
+
+  // Audit Fields
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [note: "Soft delete support"]
+
+  Note: "Master data tenaga medis / Dokter (DPJP)"
+}
+
+// Join table untuk dokter dan unit karena dokter bisa praktik di banyak poli
+Table doctor_units {
+  doctor_id uuid [ref: > doctors.id]
+  unit_id uuid [ref: > units.id]
+
+  indexes {
+    (doctor_id, unit_id) [pk]
+  }
+  
+  Note: "Relasi many-to-many antara Dokter dan Unit/Poli"
+}

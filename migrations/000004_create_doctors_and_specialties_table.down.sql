@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS doctor_units;
+DROP TABLE IF EXISTS doctors;
+DROP TABLE IF EXISTS specialties;

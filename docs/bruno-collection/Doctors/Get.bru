@@ -1,0 +1,19 @@
+meta {
+  name: Get by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/doctors/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

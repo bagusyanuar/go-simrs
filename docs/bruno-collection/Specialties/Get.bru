@@ -1,0 +1,19 @@
+meta {
+  name: Get by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/specialties/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: a6ac547a-0ede-4d7f-b1ae-693e90712e58
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

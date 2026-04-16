@@ -1,0 +1,35 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/doctors/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "specialty_id": "",
+    "unit_ids": [
+      ""
+    ],
+    "nik": "1234567890123456",
+    "sip": "SIP/123/456/789",
+    "sip_expiry_date": "2026-12-31",
+    "name": "dr. Ahmad Sujana, Sp.A (Updated)",
+    "phone": "08123456789",
+    "email": "ahmad@hospital.com",
+    "is_active": true
+  }
+}

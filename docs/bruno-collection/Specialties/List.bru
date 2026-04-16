@@ -1,0 +1,22 @@
+meta {
+  name: List
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/specialties?page=1&limit=10&sort_by=name&sort_order=asc
+  body: none
+  auth: bearer
+}
+
+query {
+  page: 1
+  limit: 10
+  sort_by: name
+  sort_order: asc
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

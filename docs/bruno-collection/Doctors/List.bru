@@ -1,0 +1,24 @@
+meta {
+  name: List
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/doctors?page=1&limit=10&sort_by=name&sort_order=asc
+  body: none
+  auth: bearer
+}
+
+query {
+  page: 1
+  limit: 10
+  sort_by: name
+  sort_order: asc
+  ~specialty_id: 
+  ~unit_id: 
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

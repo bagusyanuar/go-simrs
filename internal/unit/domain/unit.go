@@ -33,6 +33,7 @@ type UnitRepository interface {
 	Create(ctx context.Context, unit *Unit) error
 	FindAll(ctx context.Context, params request.PaginationParam, installationID *uuid.UUID) ([]Unit, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Unit, error)
+	FindByIDs(ctx context.Context, ids []uuid.UUID) ([]Unit, error)
 	FindByCode(ctx context.Context, code string) (*Unit, error)
 	Update(ctx context.Context, unit *Unit) error
 	Delete(ctx context.Context, id uuid.UUID) error

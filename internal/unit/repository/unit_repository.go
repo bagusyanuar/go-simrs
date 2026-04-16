@@ -58,6 +58,14 @@ func (r *unitRepo) FindByID(ctx context.Context, id uuid.UUID) (*domain.Unit, er
 	return &unit, nil
 }
 
+func (r *unitRepo) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]domain.Unit, error) {
+	var units []domain.Unit
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&units).Error; err != nil {
+		return nil, fmt.Errorf("unitRepo.FindByIDs: %w", err)
+	}
+	return units, nil
+}
+
 func (r *unitRepo) FindByCode(ctx context.Context, code string) (*domain.Unit, error) {
 	var unit domain.Unit
 	if err := r.db.WithContext(ctx).Where("code = ?", code).First(&unit).Error; err != nil {
