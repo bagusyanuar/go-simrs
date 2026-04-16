@@ -1,0 +1,16 @@
+Table installations {
+  id uuid [pk, note: "Primary Key menggunakan UUID v4"]
+  code varchar [unique, not null, note: "Kode unik instalasi (e.g., RJ, RI, IGD)"]
+  name varchar [not null, note: "Nama instalasi (e.g., Rawat Jalan, Rawat Inap)"]
+  is_medical boolean [default: true, note: "Flag apakah unit medis atau penunjang"]
+  
+  // Status
+  is_active boolean [default: true]
+
+  // Audit Fields
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [note: "Soft delete support"]
+
+  Note: "Master data instalasi/unit rumah sakit"
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/installations/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "code": "RJ",
+    "name": "Rawat Jalan Utama",
+    "is_medical": true,
+    "is_active": true
+  }
+}
