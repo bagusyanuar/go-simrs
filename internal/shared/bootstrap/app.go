@@ -1,0 +1,58 @@
+package bootstrap
+
+import (
+	"errors"
+
+	"github.com/bagusyanuar/go-simrs/internal/shared/config"
+	"github.com/bagusyanuar/go-simrs/internal/shared/container"
+	"github.com/bagusyanuar/go-simrs/internal/shared/middleware"
+	"github.com/bagusyanuar/go-simrs/pkg/response"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"go.uber.org/zap"
+)
+
+func Start(conf *config.Config, deps *container.Container) {
+	// Initialize Fiber app
+	app := fiber.New(fiber.Config{
+		AppName: conf.AppName,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+			var e *fiber.Error
+			if errors.As(err, &e) {
+				code = e.Code
+			}
+			return c.Status(code).JSON(response.Error(err.Error()))
+		},
+	})
+
+	// Global Middlewares
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-Request-ID",
+		AllowMethods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+	}))
+	app.Use(requestid.New())         // 1. Generate Request ID
+	app.Use(middleware.Logger(conf)) // 2. Log using custom Zap middleware
+	app.Use(recover.New())           // 3. Panic recovery
+
+	// Static files
+	app.Static("/public", "./public")
+
+	// Register Routes
+	api := app.Group("/api/v1")
+
+	// Middlewares
+	jwtMiddleware := middleware.JWTProtected(conf)
+
+	deps.RegisterRoutes(api, jwtMiddleware)
+	// Additional Hospital modules will be registered here
+
+	// Start Server
+	config.Log.Info("Server is starting...", zap.String("port", conf.AppPort))
+	if err := app.Listen(":" + conf.AppPort); err != nil {
+		config.Log.Fatal("Failed to start server", zap.Error(err))
+	}
+}

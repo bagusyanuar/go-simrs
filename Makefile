@@ -1,4 +1,4 @@
-# Makefile for go-genpos-app
+# Makefile for go-simrs-app
 
 # Load environment variables from .env
 ifneq (,$(wildcard ./.env))

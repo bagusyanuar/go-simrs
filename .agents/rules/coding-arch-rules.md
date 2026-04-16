@@ -8,7 +8,7 @@ trigger: pattern: .*\.go$
 - **Errors**: Wrap with `fmt.Errorf("context: %w", err)`.
 - **DTO**: Strict separation (Domain vs Req/Res).
 - **Optimization**: Always use `make([]T, 0, cap)` for slices. Use non-destructive Upsert for relational data.
-- **Middle Ground Calculation**: For logic involving both systemic calculation and manual overrides (e.g., COGS), always prioritize manual input if provided (> 0). Fallback to dynamic systemic logic only if override is missing/zero.
+- **Business Calculation**: For logic involving both systemic calculation and manual overrides (e.g., pricing, billing), always prioritize manual input if provided (> 0). Fallback to dynamic systemic logic only if override is missing/zero.
 
 ## 📂 Directory Rules
 
@@ -42,7 +42,6 @@ docs/databases/       → DBML schema files.
 type Foo struct {
     ID        uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
     Name      string         `gorm:"type:varchar(100);not null" json:"name"`
-    BranchID  uuid.UUID      `gorm:"type:uuid;index;not null" json:"branch_id"`
     CreatedAt time.Time      `json:"created_at"`
     UpdatedAt time.Time      `json:"updated_at"`
     DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
