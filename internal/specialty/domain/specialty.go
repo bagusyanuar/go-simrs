@@ -25,9 +25,14 @@ func (s *Specialty) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+type SpecialtyFilter struct {
+	request.PaginationParam
+	Search string `query:"search"`
+}
+
 type SpecialtyRepository interface {
 	Create(ctx context.Context, specialty *Specialty) error
-	FindAll(ctx context.Context, params request.PaginationParam) ([]Specialty, int64, error)
+	FindAll(ctx context.Context, filter SpecialtyFilter) ([]Specialty, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Specialty, error)
 	FindByCode(ctx context.Context, code string) (*Specialty, error)
 	Update(ctx context.Context, specialty *Specialty) error
@@ -36,7 +41,7 @@ type SpecialtyRepository interface {
 
 type SpecialtyUsecase interface {
 	Create(ctx context.Context, specialty *Specialty) error
-	GetAll(ctx context.Context, params request.PaginationParam) ([]Specialty, int64, error)
+	GetAll(ctx context.Context, filter SpecialtyFilter) ([]Specialty, int64, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*Specialty, error)
 	Update(ctx context.Context, id uuid.UUID, specialty *Specialty) error
 	Delete(ctx context.Context, id uuid.UUID) error

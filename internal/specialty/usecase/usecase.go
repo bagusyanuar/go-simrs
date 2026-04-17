@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/bagusyanuar/go-simrs/internal/specialty/domain"
-	"github.com/bagusyanuar/go-simrs/pkg/request"
 	"github.com/google/uuid"
 )
 
@@ -27,8 +26,8 @@ func (u *specialtyUC) Create(ctx context.Context, specialty *domain.Specialty) e
 	return u.repo.Create(ctx, specialty)
 }
 
-func (u *specialtyUC) GetAll(ctx context.Context, params request.PaginationParam) ([]domain.Specialty, int64, error) {
-	return u.repo.FindAll(ctx, params)
+func (u *specialtyUC) GetAll(ctx context.Context, filter domain.SpecialtyFilter) ([]domain.Specialty, int64, error) {
+	return u.repo.FindAll(ctx, filter)
 }
 
 func (u *specialtyUC) GetByID(ctx context.Context, id uuid.UUID) (*domain.Specialty, error) {

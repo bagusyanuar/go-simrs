@@ -5,16 +5,17 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/specialties?page=1&limit=10&sort_by=name&sort_order=asc
+  url: {{baseUrl}}/specialties?page=1&limit=10&sort_by=name&sort_order=asc&search=
   body: none
   auth: bearer
 }
 
-query {
+params:query {
   page: 1
   limit: 10
   sort_by: name
   sort_order: asc
+  search: 
 }
 
 auth:bearer {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/bagusyanuar/go-simrs/internal/specialty/domain"
-	"github.com/bagusyanuar/go-simrs/pkg/request"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -25,19 +24,24 @@ func (r *specialtyRepo) Create(ctx context.Context, specialty *domain.Specialty)
 	return nil
 }
 
-func (r *specialtyRepo) FindAll(ctx context.Context, params request.PaginationParam) ([]domain.Specialty, int64, error) {
+func (r *specialtyRepo) FindAll(ctx context.Context, filter domain.SpecialtyFilter) ([]domain.Specialty, int64, error) {
 	var specialties []domain.Specialty
 	var total int64
 
 	db := r.db.WithContext(ctx).Model(&domain.Specialty{})
 
+	if filter.Search != "" {
+		searchTerm := "%" + filter.Search + "%"
+		db = db.Where("name ILIKE ? OR code ILIKE ?", searchTerm, searchTerm)
+	}
+
 	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, fmt.Errorf("specialtyRepo.FindAll.Count: %w", err)
 	}
 
-	if err := db.Order(params.GetSort()).
-		Limit(params.GetLimit()).
-		Offset(params.GetOffset()).
+	if err := db.Order(filter.GetSort()).
+		Limit(filter.GetLimit()).
+		Offset(filter.GetOffset()).
 		Find(&specialties).Error; err != nil {
 		return nil, 0, fmt.Errorf("specialtyRepo.FindAll.Find: %w", err)
 	}
