@@ -47,12 +47,18 @@ func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
 	}
 
 	// Set SSO Session Cookie
+	secure := h.conf.AppEnv == "production"
+	sameSite := "Lax"
+	if secure {
+		sameSite = "None"
+	}
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "sso_session",
 		Value:    sessionID,
 		HTTPOnly: true,
-		Secure:   false, // Set to true in production
-		SameSite: "Lax",
+		Secure:   secure,
+		SameSite: sameSite,
 		Path:     "/",
 		Domain:   h.conf.AppDomain,
 	})
