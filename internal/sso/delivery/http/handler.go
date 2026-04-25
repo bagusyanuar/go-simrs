@@ -1,0 +1,117 @@
+package http
+
+import (
+	"github.com/bagusyanuar/go-simrs/internal/shared/config"
+	"github.com/bagusyanuar/go-simrs/internal/sso/domain"
+	"github.com/bagusyanuar/go-simrs/pkg/response"
+	"github.com/bagusyanuar/go-simrs/pkg/validator"
+	"github.com/gofiber/fiber/v2"
+)
+
+type SSOHandler struct {
+	ssoUC domain.SSOUsecase
+	conf  *config.Config
+}
+
+func NewSSOHandler(uc domain.SSOUsecase, conf *config.Config) *SSOHandler {
+	return &SSOHandler{ssoUC: uc, conf: conf}
+}
+
+func (h *SSOHandler) Register(router fiber.Router) {
+	sso := router.Group("/sso")
+	sso.Post("/authorize", h.Authorize)
+	sso.Get("/authorize", h.AuthorizeSilent) // For True SSO (Silent Login)
+	sso.Post("/token", h.ExchangeToken)
+}
+
+func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
+	var req AuthorizeRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	if errs := validator.ValidateStruct(req); len(errs) > 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	code, sessionID, err := h.ssoUC.Authorize(c.Context(), domain.AuthorizeRequest{
+		Email:         req.Email,
+		Password:      req.Password,
+		ClientID:      req.ClientID,
+		CodeChallenge: req.CodeChallenge,
+		RedirectURI:   req.RedirectURI,
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	// Set SSO Session Cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "sso_session",
+		Value:    sessionID,
+		HTTPOnly: true,
+		Secure:   false, // Set to true in production
+		SameSite: "Lax",
+		Path:     "/",
+		Domain:   h.conf.AppDomain,
+	})
+
+	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{
+		"code": code,
+	}, "authorize success"))
+}
+
+func (h *SSOHandler) AuthorizeSilent(c *fiber.Ctx) error {
+	var req AuthorizeSilentRequest
+	if err := c.QueryParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid query parameters"))
+	}
+
+	if errs := validator.ValidateStruct(req); len(errs) > 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	sessionID := c.Cookies("sso_session")
+	if sessionID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Error("no active sso session"))
+	}
+
+	code, err := h.ssoUC.AuthorizeSilent(c.Context(), sessionID, domain.AuthorizeSilentRequest{
+		ClientID:      req.ClientID,
+		CodeChallenge: req.CodeChallenge,
+		RedirectURI:   req.RedirectURI,
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Error(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{
+		"code": code,
+	}, "silent authorize success"))
+}
+
+func (h *SSOHandler) ExchangeToken(c *fiber.Ctx) error {
+	var req TokenRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	if errs := validator.ValidateStruct(req); len(errs) > 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	res, err := h.ssoUC.ExchangeToken(c.Context(), domain.TokenRequest{
+		ClientID:     req.ClientID,
+		Code:         req.Code,
+		CodeVerifier: req.CodeVerifier,
+		RedirectURI:  req.RedirectURI,
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Error(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Success(res, "token exchange success"))
+}

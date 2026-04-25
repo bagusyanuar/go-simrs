@@ -1,0 +1,27 @@
+meta {
+  name: Authorize (Login & Code)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{ssoBaseUrl}}/authorize
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "admin@simrs.com",
+    "password": "password123",
+    "client_id": "simrs-vue-app",
+    "code_challenge": "vy9IVmiNT9-vhRy_H8rtW05ohGLeCOq3tA0nLM-JEyY",
+    "redirect_uri": "http://neurovi-simulation.test:3000/callback"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    bru.setEnvVar("authCode", res.getBody().data.code);
+  }
+}

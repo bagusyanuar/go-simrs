@@ -1,0 +1,24 @@
+Table oauth_clients {
+  id uuid [pk, note: "UUID Primary Key"]
+  client_id varchar(100) [unique, not null, note: "Unique identifier for the client app"]
+  client_secret varchar(255) [note: "Optional secret for confidential clients"]
+  name varchar(100) [note: "Display name of the application"]
+  redirect_uris text [note: "Comma separated list of allowed redirect URIs"]
+  created_at timestamp [default: `now()`]
+
+  Note: "Daftar aplikasi pihak ketiga (internal/eksternal) yang diizinkan menggunakan SSO"
+}
+
+Table auth_code_sessions {
+  code varchar(255) [pk, note: "Temporary authorization code"]
+  client_id varchar(100) [not null]
+  user_id uuid [not null]
+  code_challenge text [not null, note: "PKCE Code Challenge"]
+  redirect_uri text [not null]
+  expires_at timestamp [not null]
+
+  Note: "Penyimpanan sementara untuk handshake PKCE (Short-lived session)"
+}
+
+Ref: auth_code_sessions.client_id > oauth_clients.client_id
+Ref: auth_code_sessions.user_id > users.id
