@@ -27,6 +27,12 @@ func main() {
 		},
 		{
 			ID:           uuid.New(),
+			ClientID:     "master-data-app",
+			Name:         "SIMRS Master Data App",
+			RedirectURIs: "http://neurovi-simulation.test:5173/callback,http://neurovi-simulation.test:5174/callback,http://neurovi-simulation.test:5175/callback",
+		},
+		{
+			ID:           uuid.New(),
 			ClientID:     "simrs-mobile-app",
 			Name:         "SIMRS Mobile",
 			RedirectURIs: "simrs://callback",
