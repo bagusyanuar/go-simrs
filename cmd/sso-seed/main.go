@@ -17,13 +17,13 @@ func main() {
 
 	// 3. Prepare OAuth Client
 	log.Println("Seeding SSO Whitelist Client...")
-	
+
 	clients := []ssoDomain.OAuthClient{
 		{
 			ID:           uuid.New(),
-			ClientID:     "simrs-vue-app",
-			Name:         "SIMRS Modular Vue",
-			RedirectURIs: "http://neurovi-simulation.test:3000/callback,http://neurovi-simulation.test:5173/callback,http://neurovi-simulation.test:5174/callback,http://neurovi-simulation.test:5175/callback",
+			ClientID:     "sso-app",
+			Name:         "SIMRS SSO",
+			RedirectURIs: "http://neurovi-simulation.test:5173/callback,http://neurovi-simulation.test:5174/callback,http://neurovi-simulation.test:5175/callback",
 		},
 		{
 			ID:           uuid.New(),
