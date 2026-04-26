@@ -183,3 +183,56 @@ func (u *ssoUC) ExchangeToken(ctx context.Context, req domain.TokenRequest) (*do
 		ExpiresIn:    int(atExpiration.Seconds()),
 	}, nil
 }
+
+func (u *ssoUC) RefreshToken(ctx context.Context, req domain.TokenRequest) (*domain.TokenResponse, error) {
+	// 1. Parse & Validate Refresh Token
+	claims, err := jwt.ParseToken(req.RefreshToken, u.conf.JWTRefreshSecret)
+	if err != nil {
+		return nil, errors.New("invalid or expired refresh token")
+	}
+
+	// 2. Validate Client (Optional: depends if you want to bind RT to ClientID)
+	_, err = u.ssoRepo.GetClientByID(ctx, req.ClientID)
+	if err != nil {
+		return nil, errors.New("invalid client_id")
+	}
+
+	// 3. Get User
+	user, err := u.userRepo.FindByID(ctx, uuid.MustParse(claims.Subject))
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// 4. Generate New Tokens
+	atExpiration := time.Duration(u.conf.JWTExpiration) * time.Minute
+	accessToken, err := jwt.GenerateToken(
+		user.ID.String(),
+		user.Email,
+		[]string{},
+		u.conf.JWTSecret,
+		u.conf.JWTIssuer,
+		atExpiration,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed generate AT: %w", err)
+	}
+
+	rtExpiration := time.Duration(u.conf.JWTRefreshExpiration) * time.Hour
+	refreshToken, err := jwt.GenerateToken(
+		user.ID.String(),
+		user.Email,
+		[]string{},
+		u.conf.JWTRefreshSecret,
+		u.conf.JWTIssuer,
+		rtExpiration,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed generate RT: %w", err)
+	}
+
+	return &domain.TokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpiresIn:    int(atExpiration.Seconds()),
+	}, nil
+}

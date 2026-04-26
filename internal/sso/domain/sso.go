@@ -48,6 +48,7 @@ type SSOUsecase interface {
 	Authorize(ctx context.Context, req AuthorizeRequest) (string, string, error) // Returns code, sessionID
 	AuthorizeSilent(ctx context.Context, sessionID string, req AuthorizeSilentRequest) (string, error)
 	ExchangeToken(ctx context.Context, req TokenRequest) (*TokenResponse, error)
+	RefreshToken(ctx context.Context, req TokenRequest) (*TokenResponse, error)
 }
 
 type AuthorizeRequest struct {
@@ -65,15 +66,17 @@ type AuthorizeSilentRequest struct {
 }
 
 type TokenRequest struct {
+	GrantType    string
 	ClientID     string
 	Code         string
 	CodeVerifier string
 	RedirectURI  string
+	RefreshToken string
 }
 
 type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refresh_token,omitempty"` // Omit if we only use cookie
 	ExpiresIn    int    `json:"expires_in"`
 }
 

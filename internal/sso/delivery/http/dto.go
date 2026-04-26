@@ -15,8 +15,9 @@ type AuthorizeSilentRequest struct {
 }
 
 type TokenRequest struct {
+	GrantType    string `json:"grant_type" validate:"required"`
 	ClientID     string `json:"client_id" validate:"required"`
-	Code         string `json:"code" validate:"required"`
-	CodeVerifier string `json:"code_verifier" validate:"required"`
-	RedirectURI  string `json:"redirect_uri" validate:"required"`
+	Code         string `json:"code" validate:"required_if=GrantType authorization_code"`
+	CodeVerifier string `json:"code_verifier" validate:"required_if=GrantType authorization_code"`
+	RedirectURI  string `json:"redirect_uri" validate:"required_if=GrantType authorization_code"`
 }

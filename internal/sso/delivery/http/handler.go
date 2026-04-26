@@ -1,6 +1,8 @@
 package http
 
 import (
+	"time"
+
 	"github.com/bagusyanuar/go-simrs/internal/shared/config"
 	"github.com/bagusyanuar/go-simrs/internal/sso/domain"
 	"github.com/bagusyanuar/go-simrs/pkg/response"
@@ -108,16 +110,56 @@ func (h *SSOHandler) ExchangeToken(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
 	}
 
-	res, err := h.ssoUC.ExchangeToken(c.Context(), domain.TokenRequest{
-		ClientID:     req.ClientID,
-		Code:         req.Code,
-		CodeVerifier: req.CodeVerifier,
-		RedirectURI:  req.RedirectURI,
-	})
+	var res *domain.TokenResponse
+	var err error
+
+	switch req.GrantType {
+	case "authorization_code":
+		res, err = h.ssoUC.ExchangeToken(c.Context(), domain.TokenRequest{
+			GrantType:    req.GrantType,
+			ClientID:     req.ClientID,
+			Code:         req.Code,
+			CodeVerifier: req.CodeVerifier,
+			RedirectURI:  req.RedirectURI,
+		})
+	case "refresh_token":
+		refreshToken := c.Cookies("refresh_token")
+		if refreshToken == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(response.Error("refresh token not found"))
+		}
+
+		res, err = h.ssoUC.RefreshToken(c.Context(), domain.TokenRequest{
+			GrantType:    req.GrantType,
+			ClientID:     req.ClientID,
+			RefreshToken: refreshToken,
+		})
+	default:
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("unsupported grant_type"))
+	}
 
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Error(err.Error()))
 	}
 
-	return c.Status(fiber.StatusOK).JSON(response.Success(res, "token exchange success"))
+	// Set Refresh Token Cookie
+	secure := h.conf.AppEnv == "production"
+	sameSite := "Lax"
+	if secure {
+		sameSite = "None"
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    res.RefreshToken,
+		HTTPOnly: true,
+		Secure:   secure,
+		SameSite: sameSite,
+		Path:     "/",
+		Expires:  time.Now().Add(time.Duration(h.conf.JWTRefreshExpiration) * time.Hour),
+	})
+
+	// Hide refresh token from JSON response if you want it only in cookie
+	res.RefreshToken = ""
+
+	return c.Status(fiber.StatusOK).JSON(response.Success(res, "token success"))
 }
