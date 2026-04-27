@@ -63,6 +63,7 @@ func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
 		SameSite: sameSite,
 		Path:     "/",
 		Domain:   h.conf.AppDomain,
+		Expires:  time.Now().Add(24 * time.Hour),
 	})
 
 	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{
@@ -155,6 +156,7 @@ func (h *SSOHandler) ExchangeToken(c *fiber.Ctx) error {
 		Secure:   secure,
 		SameSite: sameSite,
 		Path:     "/",
+		Domain:   h.conf.AppDomain,
 		Expires:  time.Now().Add(time.Duration(h.conf.JWTRefreshExpiration) * time.Hour),
 	})
 
