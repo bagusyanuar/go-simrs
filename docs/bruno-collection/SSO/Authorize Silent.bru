@@ -1,0 +1,17 @@
+meta {
+  name: Authorize Silent
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{ssoBaseUrl}}/authorize?client_id=simrs-vue-app&code_challenge=vy9IVmiNT9-vhRy_H8rtW05ohGLeCOq3tA0nLM-JEyY&redirect_uri=http://neurovi-simulation.test:3000/callback
+  body: none
+  auth: none
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    bru.setEnvVar("authCode", res.getBody().data.code);
+  }
+}

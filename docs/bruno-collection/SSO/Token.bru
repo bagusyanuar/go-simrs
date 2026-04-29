@@ -12,6 +12,7 @@ post {
 
 body:json {
   {
+    "grant_type": "authorization_code",
     "client_id": "simrs-vue-app",
     "code": "{{authCode}}",
     "code_verifier": "some_random_verifier_string",

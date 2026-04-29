@@ -1,0 +1,25 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{ssoBaseUrl}}/token
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "grant_type": "refresh_token",
+    "client_id": "simrs-vue-app"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    const data = res.getBody().data;
+    bru.setEnvVar("accessToken", data.access_token);
+  }
+}
