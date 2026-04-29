@@ -15,3 +15,26 @@ script:post-response {
     bru.setEnvVar("authCode", res.getBody().data.code);
   }
 }
+
+docs {
+  ## Authorize Silent
+  Cek sesi SSO global via cookie `sso_session`. Jika valid, langsung dapat `code`.
+  
+  ### Success Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "message": "silent authorize success",
+    "data": {
+      "code": "UUID-AUTH-CODE"
+    }
+  }
+  ```
+  
+  ### Error Response (401 Unauthorized)
+  ```json
+  {
+    "success": false,
+    "message": "no active sso session"
+  }
+}

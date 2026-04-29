@@ -27,3 +27,20 @@ script:post-response {
     bru.setEnvVar("refreshToken", data.refresh_token);
   }
 }
+
+docs {
+  ## Exchange Token
+  Menukarkan `authorization_code` dengan `access_token`.
+  
+  ### Success Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "message": "token success",
+    "data": {
+      "access_token": "eyJhbGciOi...",
+      "expires_in": 3600
+    }
+  }
+  ```
+}

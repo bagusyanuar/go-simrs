@@ -23,3 +23,20 @@ script:post-response {
     bru.setEnvVar("accessToken", data.access_token);
   }
 }
+
+docs {
+  ## Refresh Token
+  Mendapatkan `access_token` baru menggunakan `refresh_token` dari cookie.
+  
+  ### Success Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "message": "token success",
+    "data": {
+      "access_token": "eyJhbGciOi...",
+      "expires_in": 3600
+    }
+  }
+  ```
+}
