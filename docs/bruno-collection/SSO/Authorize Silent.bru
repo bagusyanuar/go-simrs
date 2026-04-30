@@ -5,9 +5,17 @@ meta {
 }
 
 get {
-  url: {{ssoBaseUrl}}/authorize?client_id=simrs-vue-app&code_challenge=vy9IVmiNT9-vhRy_H8rtW05ohGLeCOq3tA0nLM-JEyY&redirect_uri=http://neurovi-simulation.test:3000/callback
+  url: {{ssoBaseUrl}}/authorize?client_id=master-data-app&code_challenge=vy9IVmiNT9-vhRy_H8rtW05ohGLeCOq3tA0nLM-JEyY&redirect_uri=http://neurovi-simulation.test:3000/callback&state=some-state&response_type=code
   body: none
   auth: none
+}
+
+params:query {
+  client_id: master-data-app
+  code_challenge: vy9IVmiNT9-vhRy_H8rtW05ohGLeCOq3tA0nLM-JEyY
+  redirect_uri: http://neurovi-simulation.test:3000/callback
+  state: some-state
+  response_type: code
 }
 
 script:post-response {
@@ -26,7 +34,8 @@ docs {
     "success": true,
     "message": "silent authorize success",
     "data": {
-      "code": "UUID-AUTH-CODE"
+      "code": "UUID-AUTH-CODE",
+      "state": "some-state"
     }
   }
   ```

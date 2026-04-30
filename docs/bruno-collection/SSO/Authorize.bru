@@ -14,9 +14,10 @@ body:json {
   {
     "email": "admin@simrs.com",
     "password": "password123",
-    "client_id": "simrs-vue-app",
+    "client_id": "master-data-app",
     "code_challenge": "vy9IVmiNT9-vhRy_H8rtW05ohGLeCOq3tA0nLM-JEyY",
-    "redirect_uri": "http://neurovi-simulation.test:3000/callback"
+    "redirect_uri": "http://neurovi-simulation.test:3000/callback",
+    "state": "some-random-state"
   }
 }
 
@@ -36,7 +37,8 @@ docs {
     "success": true,
     "message": "authorize success",
     "data": {
-      "code": "UUID-AUTH-CODE"
+      "code": "UUID-AUTH-CODE",
+      "state": "some-random-state"
     }
   }
   ```

@@ -42,6 +42,7 @@ func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
 		ClientID:      req.ClientID,
 		CodeChallenge: req.CodeChallenge,
 		RedirectURI:   req.RedirectURI,
+		State:         req.State,
 	})
 
 	if err != nil {
@@ -67,7 +68,8 @@ func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
 	})
 
 	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{
-		"code": code,
+		"code":  code,
+		"state": req.State,
 	}, "authorize success"))
 }
 
@@ -81,6 +83,10 @@ func (h *SSOHandler) AuthorizeSilent(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
 	}
 
+	if req.ResponseType != "code" {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("unsupported response_type"))
+	}
+
 	sessionID := c.Cookies("sso_session")
 	if sessionID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Error("no active sso session"))
@@ -90,6 +96,8 @@ func (h *SSOHandler) AuthorizeSilent(c *fiber.Ctx) error {
 		ClientID:      req.ClientID,
 		CodeChallenge: req.CodeChallenge,
 		RedirectURI:   req.RedirectURI,
+		State:         req.State,
+		ResponseType:  req.ResponseType,
 	})
 
 	if err != nil {
@@ -97,7 +105,8 @@ func (h *SSOHandler) AuthorizeSilent(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{
-		"code": code,
+		"code":  code,
+		"state": req.State,
 	}, "silent authorize success"))
 }
 

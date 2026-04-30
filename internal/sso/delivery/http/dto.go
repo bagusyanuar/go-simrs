@@ -6,12 +6,15 @@ type AuthorizeRequest struct {
 	ClientID      string `json:"client_id" validate:"required"`
 	CodeChallenge string `json:"code_challenge" validate:"required"`
 	RedirectURI   string `json:"redirect_uri" validate:"required"`
+	State         string `json:"state"`
 }
 
 type AuthorizeSilentRequest struct {
 	ClientID      string `query:"client_id" validate:"required"`
 	CodeChallenge string `query:"code_challenge" validate:"required"`
 	RedirectURI   string `query:"redirect_uri" validate:"required"`
+	State         string `query:"state"`
+	ResponseType  string `query:"response_type" validate:"required"`
 }
 
 type TokenRequest struct {

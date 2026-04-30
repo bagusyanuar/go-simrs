@@ -57,12 +57,15 @@ type AuthorizeRequest struct {
 	ClientID      string
 	CodeChallenge string
 	RedirectURI   string
+	State         string
 }
 
 type AuthorizeSilentRequest struct {
 	ClientID      string
 	CodeChallenge string
 	RedirectURI   string
+	State         string
+	ResponseType  string
 }
 
 type TokenRequest struct {
