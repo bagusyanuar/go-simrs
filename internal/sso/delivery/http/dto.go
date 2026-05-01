@@ -15,6 +15,7 @@ type AuthorizeSilentRequest struct {
 	RedirectURI   string `query:"redirect_uri" validate:"required"`
 	State         string `query:"state"`
 	ResponseType  string `query:"response_type" validate:"required"`
+	Prompt        string `query:"prompt"`
 }
 
 type TokenRequest struct {

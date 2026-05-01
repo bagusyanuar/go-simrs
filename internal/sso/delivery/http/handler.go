@@ -56,6 +56,12 @@ func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
 		sameSite = "None"
 	}
 
+	domain := h.conf.AppDomain
+	// If domain doesn't start with dot and it's not localhost, add it for cross-subdomain support
+	if domain != "" && domain != "localhost" && domain[0] != '.' {
+		domain = "." + domain
+	}
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "sso_session",
 		Value:    sessionID,
@@ -63,7 +69,7 @@ func (h *SSOHandler) Authorize(c *fiber.Ctx) error {
 		Secure:   secure,
 		SameSite: sameSite,
 		Path:     "/",
-		Domain:   h.conf.AppDomain,
+		Domain:   domain,
 		Expires:  time.Now().Add(24 * time.Hour),
 	})
 
@@ -89,7 +95,11 @@ func (h *SSOHandler) AuthorizeSilent(c *fiber.Ctx) error {
 
 	sessionID := c.Cookies("sso_session")
 	if sessionID == "" {
-		return c.Status(fiber.StatusUnauthorized).JSON(response.Error("no active sso session"))
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status":  "error",
+			"message": "login_required",
+			"error":   "login_required",
+		})
 	}
 
 	code, err := h.ssoUC.AuthorizeSilent(c.Context(), sessionID, domain.AuthorizeSilentRequest{
@@ -101,7 +111,11 @@ func (h *SSOHandler) AuthorizeSilent(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(response.Error(err.Error()))
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status":  "error",
+			"message": "login_required",
+			"error":   "login_required",
+		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{
@@ -158,6 +172,11 @@ func (h *SSOHandler) ExchangeToken(c *fiber.Ctx) error {
 		sameSite = "None"
 	}
 
+	domain := h.conf.AppDomain
+	if domain != "" && domain != "localhost" && domain[0] != '.' {
+		domain = "." + domain
+	}
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "refresh_token",
 		Value:    res.RefreshToken,
@@ -165,7 +184,7 @@ func (h *SSOHandler) ExchangeToken(c *fiber.Ctx) error {
 		Secure:   secure,
 		SameSite: sameSite,
 		Path:     "/",
-		Domain:   h.conf.AppDomain,
+		Domain:   domain,
 		Expires:  time.Now().Add(time.Duration(h.conf.JWTRefreshExpiration) * time.Hour),
 	})
 

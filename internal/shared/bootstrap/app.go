@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/bagusyanuar/go-simrs/internal/shared/config"
 	"github.com/bagusyanuar/go-simrs/internal/shared/container"
@@ -30,7 +31,16 @@ func Start(conf *config.Config, deps *container.Container) {
 
 	// Global Middlewares
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     conf.AllowedOrigins,
+		AllowOrigins: conf.AllowedOrigins,
+		AllowOriginsFunc: func(origin string) bool {
+			// In development, allow any origin that contains our APP_DOMAIN or localhost
+			if conf.AppEnv == "development" {
+				return (conf.AppDomain != "" && strings.Contains(origin, conf.AppDomain)) || 
+					strings.Contains(origin, "localhost") || 
+					strings.Contains(origin, "127.0.0.1")
+			}
+			return false
+		},
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Request-ID",
 		AllowMethods:     "GET, POST, PUT, DELETE, PATCH, OPTIONS",
 		AllowCredentials: true,
